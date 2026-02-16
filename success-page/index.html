@@ -127,7 +127,7 @@
     <div class="container">
         <div class="success-icon"></div>
         <h1>Successfully Logged In!</h1>
-        <p class="subtitle">You have been authenticated with the High Security Client</p>
+        <p class="subtitle" id="client-info">You have been authenticated</p>
         
         <div class="info-box">
             <h3>Session Information</h3>
@@ -144,6 +144,16 @@
         
         for (const [key, value] of urlParams) {
             params[key] = value;
+        }
+        
+        // Detect and display which client was used
+        const clientInfoEl = document.getElementById('client-info');
+        if (params.client === 'high-security') {
+            clientInfoEl.innerHTML = 'You have been authenticated with the<br><strong style="font-size: 1.3rem; color: #1f2937;">High Security Client</strong><br><span style="color: #10b981; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">✓ reCAPTCHA verification was required</span>';
+        } else if (params.client === 'low-security') {
+            clientInfoEl.innerHTML = 'You have been authenticated with the<br><strong style="font-size: 1.3rem; color: #1f2937;">Low Security Client</strong><br><span style="color: #f59e0b; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">⚠️ No reCAPTCHA verification required</span>';
+        } else {
+            clientInfoEl.innerHTML = 'You have been authenticated';
         }
         
         let infoHtml = '';

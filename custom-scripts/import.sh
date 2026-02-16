@@ -68,7 +68,7 @@ for i in {1..10}; do
           "protocol": "openid-connect",
           "standardFlowEnabled": true,
           "directAccessGrantsEnabled": true,
-          "redirectUris": ["http://localhost:8091/"],
+          "redirectUris": ["http://localhost:8091/?client=high-security"],
           "webOrigins": ["http://localhost:8091"]
         }' -i)
         
@@ -89,7 +89,7 @@ for i in {1..10}; do
           "protocol": "openid-connect",
           "standardFlowEnabled": true,
           "directAccessGrantsEnabled": true,
-          "redirectUris": ["http://localhost:8091/"],
+          "redirectUris": ["http://localhost:8091/?client=low-security"],
           "webOrigins": ["http://localhost:8091"]
         }' -i)
 

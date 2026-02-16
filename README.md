@@ -109,7 +109,7 @@ This client uses the custom `recaptcha-flow` and **requires** reCAPTCHA verifica
 
 1. Open the following URL in your browser:
    ```
-   http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=high-security-client&redirect_uri=http://localhost:8091/&response_type=code&scope=openid
+   http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=high-security-client&redirect_uri=http://localhost:8091/?client=high-security&response_type=code&scope=openid
    ```
 
 2. You should see the Keycloak login page with:
@@ -125,6 +125,8 @@ This client uses the custom `recaptcha-flow` and **requires** reCAPTCHA verifica
 
 5. Upon successful authentication, you'll be redirected to the success page showing:
    - "Successfully Logged In!" message
+   - **Client identifier: "High Security Client"**
+   - **"✓ reCAPTCHA verification was required"**
    - Session information
    - Authorization code
 
@@ -134,7 +136,7 @@ This client uses the default browser flow and **does NOT require** reCAPTCHA:
 
 1. Open the following URL in your browser:
    ```
-   http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=low-security-client&redirect_uri=http://localhost:8091/&response_type=code&scope=openid
+   http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=low-security-client&redirect_uri=http://localhost:8091/?client=low-security&response_type=code&scope=openid
    ```
 
 2. You should see the **standard** Keycloak login page with:
@@ -148,7 +150,11 @@ This client uses the default browser flow and **does NOT require** reCAPTCHA:
 
 4. **Click Sign In** - No reCAPTCHA challenge required! ← **Key Difference**
 
-5. You'll be redirected to the success page immediately after valid credentials
+5. You'll be redirected to the success page showing:
+   - "Successfully Logged In!" message
+   - **Client identifier: "Low Security Client"**
+   - **"⚠️ No reCAPTCHA verification required"**
+   - Session information (notice the different client identifier!)
 
 **This demonstrates per-client authentication flow binding** - different applications can have different security requirements within the same realm!
 
@@ -207,13 +213,14 @@ The `custom-scripts/import.sh` script automatically configures Keycloak on start
 
 **Client Configuration**:
 - Creates `high-security-client` as a public OpenID Connect client
-  - Sets redirect URI to `http://localhost:8091/` (success page)
+  - Sets redirect URI to `http://localhost:8091/?client=high-security`
   - **Binds to `recaptcha-flow`** for browser authentication (requires reCAPTCHA)
   - Enables standard flow and direct access grants
 - Creates `low-security-client` as a public OpenID Connect client
-  - Sets redirect URI to `http://localhost:8091/` (success page)
+  - Sets redirect URI to `http://localhost:8091/?client=low-security`
   - **Uses default browser flow** (no reCAPTCHA required)
   - Enables standard flow and direct access grants
+- Redirect URIs include client identifiers for dynamic success page display
 - This demonstrates **per-client authentication flow binding** - different apps can have different security policies
 
 **Test User**:
@@ -317,14 +324,24 @@ docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients \
 ### Redirect URI Mismatch
 
 1. Ensure the success-page container is running: `docker ps`
-2. Verify the redirect URI exactly matches: `http://localhost:8091/`
+2. Verify the redirect URIs match exactly in your test URL:
+   - High security: `http://localhost:8091/?client=high-security`
+   - Low security: `http://localhost:8091/?client=low-security`
 3. Check client configuration in Admin Console → Clients → (client-name) → Valid Redirect URIs
 
 ### Want to Compare Both Clients?
 
 Open both URLs in different browser tabs to see the difference:
-- With reCAPTCHA: `...?client_id=high-security-client&...`
-- Without reCAPTCHA: `...?client_id=low-security-client&...`
+- **With reCAPTCHA**: 
+  ```
+  http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=high-security-client&redirect_uri=http://localhost:8091/?client=high-security&response_type=code&scope=openid
+  ```
+- **Without reCAPTCHA**: 
+  ```
+  http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=low-security-client&redirect_uri=http://localhost:8091/?client=low-security&response_type=code&scope=openid
+  ```
+
+The success page will display different messages indicating which client was used!
 
 ## Environment Variables
 
