@@ -7,3 +7,6 @@
 .idea
 notes.txt
 .java-version
+
+# Environment variables with secrets
+.env

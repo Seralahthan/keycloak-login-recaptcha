@@ -12,11 +12,11 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       REALM_NAME: test-realm
-      USER_NAME: seran
-      USER_PASS: qazwsx
-      RECAPTCHA_SITE_KEY: 6LdMUWgsAAAAACbp4FQU9I9BqRUtg5ZqYnqUWPsY
-      RECAPTCHA_SECRET_KEY: 6LdMUWgsAAAAAKewdXJ8WYwnPcF0n4Ihwe75iCf6
-      KC_LOG_LEVEL: INFO,com.identicum.keycloak.recaptcha:DEBUG
+      USER_NAME: ${USER_NAME}
+      USER_PASS: ${USER_PASS}
+      RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY}
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
+      KC_LOG_LEVEL: INFO,org.keycloak.extensions.recaptcha:DEBUG
     volumes:
       - ./target/recaptcha-login.jar:/opt/keycloak/providers/recaptcha-login.jar
       - ./themes/mytheme:/opt/keycloak/themes/mytheme
