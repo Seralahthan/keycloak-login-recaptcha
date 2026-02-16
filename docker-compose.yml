@@ -26,3 +26,12 @@ services:
       - ./quarkus.properties:/opt/keycloak/conf/quarkus.properties
     ports:
       - 8090:8080
+
+  success-page:
+    container_name: success-page
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./success-page:/usr/share/nginx/html:ro
+    ports:
+      - 8091:80

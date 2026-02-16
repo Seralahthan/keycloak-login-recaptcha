@@ -68,8 +68,8 @@ for i in {1..10}; do
           "protocol": "openid-connect",
           "standardFlowEnabled": true,
           "directAccessGrantsEnabled": true,
-          "redirectUris": ["http://localhost:8090/*"],
-          "webOrigins": ["http://localhost:8090"]
+          "redirectUris": ["http://localhost:8091/"],
+          "webOrigins": ["http://localhost:8091"]
         }' -i)
         
         echo "Client created with ID: $CLIENT_ID"
