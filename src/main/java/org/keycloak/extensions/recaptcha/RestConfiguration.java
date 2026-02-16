@@ -1,4 +1,4 @@
-package com.identicum.keycloak.recaptcha;
+package org.keycloak.extensions.recaptcha;
 
 import org.jboss.logging.Logger;
 import java.util.Map;

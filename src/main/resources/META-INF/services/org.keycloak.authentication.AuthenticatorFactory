@@ -1,1 +1,1 @@
-com.identicum.keycloak.recaptcha.RecaptchaUsernamePasswordFormFactory
+org.keycloak.extensions.recaptcha.RecaptchaUsernamePasswordFormFactory

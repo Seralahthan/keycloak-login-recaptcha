@@ -3,7 +3,7 @@
     <name>Recaptcha Login</name>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.identicum.keycloak.recaptcha</groupId>
+    <groupId>org.keycloak.extensions.recaptcha</groupId>
     <artifactId>recaptcha-login-provider</artifactId>
     <version>0.2.7-SNAPSHOT</version>
     <packaging>jar</packaging>

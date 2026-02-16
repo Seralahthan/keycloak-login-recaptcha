@@ -1,4 +1,4 @@
-package com.identicum.keycloak.recaptcha;
+package org.keycloak.extensions.recaptcha;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.provider.ProviderConfigProperty;
 
-import static com.identicum.keycloak.recaptcha.HttpStats.TO_MILLISECONDS;
-import static com.identicum.keycloak.recaptcha.RestConfiguration.*;
+import static org.keycloak.extensions.recaptcha.HttpStats.TO_MILLISECONDS;
+import static org.keycloak.extensions.recaptcha.RestConfiguration.*;
 
 public class RecaptchaUsernamePasswordFormFactory implements AuthenticatorFactory {
 
