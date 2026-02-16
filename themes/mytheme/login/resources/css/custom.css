@@ -1,0 +1,63 @@
+/* Custom styles for reCAPTCHA integration */
+
+/* Remove extra white space around reCAPTCHA */
+.pf-v5-c-form__group:has(.recaptcha-wrapper) {
+    margin-bottom: 1rem;
+    padding-bottom: 0;
+}
+
+/* Center the reCAPTCHA widget and remove extra spacing */
+.recaptcha-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+#recaptcha-container {
+    display: inline-block;
+    max-width: 100%;
+    line-height: 0; /* Removes extra space below iframe */
+    height: 78px; /* Standard reCAPTCHA v2 height */
+    overflow: hidden; /* Hide any extra space */
+}
+
+/* Ensure reCAPTCHA widget fits properly */
+.g-recaptcha {
+    margin: 0;
+    line-height: 0;
+    height: 78px !important;
+    overflow: hidden;
+}
+
+/* Constrain the reCAPTCHA iframe */
+.g-recaptcha iframe {
+    height: 78px !important;
+    max-height: 78px !important;
+}
+
+/* Hide the white space in reCAPTCHA response textarea */
+#g-recaptcha-response {
+    display: none !important;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 400px) {
+    #recaptcha-container {
+        transform: scale(0.85);
+        transform-origin: center center;
+    }
+}
+
+/* Increase realm name/title font size to match base theme */
+/* .pf-v5-c-brand {
+    font-size: 2.5rem !important;
+    font-weight: 300 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+} */
+
+

@@ -1,0 +1,28 @@
+services:
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.5.3
+    restart: unless-stopped
+    entrypoint: sh  # Override default entrypoint
+    # command: start-dev
+    command: 
+      - -c 
+      - "/opt/keycloak/startup-scripts/start-import-process.sh & /opt/keycloak/bin/kc.sh start-dev"  # Run script in background, then start Keycloak
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      REALM_NAME: test-realm
+      USER_NAME: seran
+      USER_PASS: qazwsx
+      RECAPTCHA_SITE_KEY: 6LdMUWgsAAAAACbp4FQU9I9BqRUtg5ZqYnqUWPsY
+      RECAPTCHA_SECRET_KEY: 6LdMUWgsAAAAAKewdXJ8WYwnPcF0n4Ihwe75iCf6
+      KC_LOG_LEVEL: INFO,com.identicum.keycloak.recaptcha:DEBUG
+    volumes:
+      - ./target/recaptcha-login.jar:/opt/keycloak/providers/recaptcha-login.jar
+      - ./themes/mytheme:/opt/keycloak/themes/mytheme
+      - ./startup-scripts/:/opt/keycloak/startup-scripts/
+      - ./custom-scripts/:/opt/keycloak/custom-scripts/
+      - ./objects/:/opt/keycloak/objects/
+      - ./quarkus.properties:/opt/keycloak/conf/quarkus.properties
+    ports:
+      - 8090:8080
