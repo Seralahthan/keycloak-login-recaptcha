@@ -5,7 +5,7 @@ A Keycloak Authenticator SPI extension that adds Google reCAPTCHA v2 protection 
 ## Features
 
 - ✅ **Google reCAPTCHA v2 integration** - Adds bot protection to your Keycloak login forms
-- ✅ **Per-client authentication flow binding** - Configure different authentication flows for different clients
+- ✅ **Per-client authentication flow binding** - Configure different authentication flows for different clients (demo includes two clients: one with reCAPTCHA, one without)
 - ✅ **Custom theme support** - Extends the Keycloak base theme with reCAPTCHA widget
 - ✅ **Automated setup** - Includes scripts for automatic realm and client configuration
 - ✅ **Docker-based development** - Quick setup with docker-compose
@@ -97,10 +97,15 @@ You should also see logs indicating:
 - Realm `test-realm` created
 - Authentication flow `recaptcha-flow` configured
 - Client `high-security-client` created with flow binding
+- Client `low-security-client` created (uses default flow without reCAPTCHA)
 
 ### 6. Test the Login Flow
 
-Once Keycloak is ready, test the authentication flow:
+Once Keycloak is ready, test both authentication flows to see per-client reCAPTCHA configuration in action:
+
+#### Test 6.1: High-Security Client (WITH reCAPTCHA)
+
+This client uses the custom `recaptcha-flow` and **requires** reCAPTCHA verification:
 
 1. Open the following URL in your browser:
    ```
@@ -110,18 +115,42 @@ Once Keycloak is ready, test the authentication flow:
 2. You should see the Keycloak login page with:
    - Username field
    - Password field
-   - **reCAPTCHA widget** ("I'm not a robot" checkbox)
+   - **✅ reCAPTCHA widget** ("I'm not a robot" checkbox) ← **Present**
 
 3. Enter the credentials:
    - **Username**: The value you set in `USER_NAME` (default: `testuser`)
    - **Password**: The value you set in `USER_PASS` (default: `testpassword`)
 
-4. Complete the reCAPTCHA challenge
+4. **Complete the reCAPTCHA challenge** ← **Required**
 
 5. Upon successful authentication, you'll be redirected to the success page showing:
    - "Successfully Logged In!" message
    - Session information
    - Authorization code
+
+#### Test 6.2: Low-Security Client (WITHOUT reCAPTCHA)
+
+This client uses the default browser flow and **does NOT require** reCAPTCHA:
+
+1. Open the following URL in your browser:
+   ```
+   http://localhost:8090/realms/test-realm/protocol/openid-connect/auth?client_id=low-security-client&redirect_uri=http://localhost:8091/&response_type=code&scope=openid
+   ```
+
+2. You should see the **standard** Keycloak login page with:
+   - Username field
+   - Password field
+   - **❌ NO reCAPTCHA widget** ← **Not Present**
+
+3. Enter the same credentials:
+   - **Username**: `testuser` (or your `USER_NAME`)
+   - **Password**: `testpassword` (or your `USER_PASS`)
+
+4. **Click Sign In** - No reCAPTCHA challenge required! ← **Key Difference**
+
+5. You'll be redirected to the success page immediately after valid credentials
+
+**This demonstrates per-client authentication flow binding** - different applications can have different security requirements within the same realm!
 
 ### 7. Access the Admin Console
 
@@ -136,8 +165,10 @@ Manage your Keycloak configuration through the admin console:
 From here you can:
 - View/edit the `test-realm` realm
 - Inspect the `recaptcha-flow` authentication flow
-- Configure the `high-security-client` client
+- Configure the `high-security-client` client (bound to `recaptcha-flow`)
+- Configure the `low-security-client` client (uses default browser flow)
 - Adjust reCAPTCHA settings in the execution configuration
+- Compare authentication flow bindings between the two clients
 
 ## Implementation Details
 
@@ -176,9 +207,14 @@ The `custom-scripts/import.sh` script automatically configures Keycloak on start
 
 **Client Configuration**:
 - Creates `high-security-client` as a public OpenID Connect client
-- Sets redirect URI to `http://localhost:8091/` (success page)
-- Binds the client to use `recaptcha-flow` for browser authentication
-- Enables standard flow and direct access grants
+  - Sets redirect URI to `http://localhost:8091/` (success page)
+  - **Binds to `recaptcha-flow`** for browser authentication (requires reCAPTCHA)
+  - Enables standard flow and direct access grants
+- Creates `low-security-client` as a public OpenID Connect client
+  - Sets redirect URI to `http://localhost:8091/` (success page)
+  - **Uses default browser flow** (no reCAPTCHA required)
+  - Enables standard flow and direct access grants
+- This demonstrates **per-client authentication flow binding** - different apps can have different security policies
 
 **Test User**:
 - Creates a test user from environment variables
@@ -246,36 +282,49 @@ Theme changes are hot-reloaded in development mode. Simply:
 
 ### Viewing Configuration
 
-Access the reCAPTCHA execution configuration:
+Access client and flow configuration:
 
 ```bash
-# Get the client ID
+# Authenticate with Keycloak admin CLI
 docker exec keycloak /opt/keycloak/bin/kcadm.sh config credentials \
   --server http://localhost:8080 --realm master --user admin --password admin
 
+# View high-security-client (with reCAPTCHA flow binding)
 docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients \
   -r test-realm -q clientId=high-security-client
+
+# View low-security-client (default browser flow)
+docker exec keycloak /opt/keycloak/bin/kcadm.sh get clients \
+  -r test-realm -q clientId=low-security-client
 ```
 
 ## Troubleshooting
 
-### reCAPTCHA Not Showing
+### reCAPTCHA Not Showing (on high-security-client)
 
 1. Check browser console for JavaScript errors
 2. Verify `RECAPTCHA_SITE_KEY` is correctly set in `.env`
 3. Ensure the theme is set: Check Admin Console → Realm Settings → Themes → Login Theme = `mytheme`
+4. Confirm you're testing with `high-security-client` URL (not `low-security-client`)
 
 ### Authentication Fails with reCAPTCHA Error
 
 1. Verify `RECAPTCHA_SECRET_KEY` is correct in `.env`
 2. Check Keycloak logs: `docker logs keycloak | grep recaptcha`
 3. Ensure you completed the reCAPTCHA challenge
+4. Test with `low-security-client` to verify credentials are correct
 
 ### Redirect URI Mismatch
 
 1. Ensure the success-page container is running: `docker ps`
 2. Verify the redirect URI exactly matches: `http://localhost:8091/`
-3. Check client configuration in Admin Console → Clients → high-security-client → Valid Redirect URIs
+3. Check client configuration in Admin Console → Clients → (client-name) → Valid Redirect URIs
+
+### Want to Compare Both Clients?
+
+Open both URLs in different browser tabs to see the difference:
+- With reCAPTCHA: `...?client_id=high-security-client&...`
+- Without reCAPTCHA: `...?client_id=low-security-client&...`
 
 ## Environment Variables
 

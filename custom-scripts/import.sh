@@ -40,7 +40,7 @@ for i in {1..10}; do
         echo "Created execution with ID: $EXECUTION_ID"
         
         echo "Setting reCAPTCHA config..."
-        $KCADM create authentication/executions/"$EXECUTION_ID"/config -r "$REALM_NAME" -b '{"alias": "recaptcha-config", "config": {"siteKey": "'"$RECAPTCHA_SITE_KEY"'", "siteSecret": "'"$RECAPTCHA_SECRET_KEY"'", "apiConnectTimeout": "1000", "maxHttpConnections": "5", "apiSocketTimeout": "1000", "apiConnectionRequestTimeout": "1000", "httpStatsInterval": "0"}}'
+        $KCADM create authentication/executions/"$EXECUTION_ID"/config -r "$REALM_NAME" -b '{"alias": "recaptcha-config", "config": {"siteKey": "'"$RECAPTCHA_SITE_KEY"'", "siteSecret": "'"$RECAPTCHA_SECRET_KEY"'", "apiConnectTimeout": "5000", "maxHttpConnections": "100", "apiSocketTimeout": "10000", "apiConnectionRequestTimeout": "5000", "httpStatsInterval": "60"}}'
 
         # $KCADM update realms/${REALM_NAME} -s browserFlow=$FLOW_ALIAS
 
@@ -78,6 +78,23 @@ for i in {1..10}; do
         echo "Flow ID to bind: $FLOW_ID"
         $KCADM update clients/"$CLIENT_ID" -r "$REALM_NAME" -s "authenticationFlowBindingOverrides.browser=$FLOW_ID"
         
+        echo "Verifying flow binding..."
+        $KCADM get clients/$CLIENT_ID -r $REALM_NAME | grep -A 2 "authenticationFlowBindingOverrides"
+
+        echo "Creating client 'low-security-client'..."
+        CLIENT_ID=$($KCADM create clients -r $REALM_NAME -b '{
+          "clientId": "low-security-client",
+          "enabled": true,
+          "publicClient": true,
+          "protocol": "openid-connect",
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": true,
+          "redirectUris": ["http://localhost:8091/"],
+          "webOrigins": ["http://localhost:8091"]
+        }' -i)
+
+        echo "Client created with ID: $CLIENT_ID"
+
         echo "Verifying flow binding..."
         $KCADM get clients/$CLIENT_ID -r $REALM_NAME | grep -A 2 "authenticationFlowBindingOverrides"
 
