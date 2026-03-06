@@ -10,7 +10,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <keycloak.version>26.5.3</keycloak.version>
+        <keycloak.version>26.5.5</keycloak.version>
         <jboss.logging.version>3.5.3.Final</jboss.logging.version>
     </properties>
 
